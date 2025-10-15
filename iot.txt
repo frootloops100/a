@@ -1,0 +1,217 @@
+Displaying different LED patterns with Raspberry Pi
+
+import RPi.GPIO as GPIO
+import time
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(7,GPIO.OUT)
+for i in range(10):
+    GPIO.output(7,True)
+    print('LED IS FINALLY ON')
+    time.sleep(2)
+
+    GPIO.output(7,False)
+    print('LED IS OFF')
+    time.sleep(1)
+
+print('prog')
+GPIO.cleanup()
+
+
+Displaying Time over 4-Digit 7-Segment Display using Raspberry Pi.
+
+clc.py
+
+from time import sleep
+import tm1637
+import _thread
+try:
+    import _thread
+except ImportError:
+    import thread as _thread
+
+# Initialize the clock (GND, VCC=3.3V, Example Pins are DIO=20 and CLK=21)
+Display = tm1637.TM1637(CLK=21, DIO=20, brightness=1.0)
+
+try:
+    print("Starting clock in the background (press CTRL + C to stop):")
+    Display.StartClock(military_time=False)
+    print('Continue Python script and tweak Display!')
+    sleep(5)
+    Display.ShowDoublepoint(False)
+    sleep(5)
+    loops = 3
+    while loops > 0:
+        for i in range(0, 7):
+            Display.SetBrightness(i)
+            sleep(0.5)
+        loops -= 1
+    Display.StopClock()
+    _thread.interrupt_main()
+except KeyboardInterrupt:
+    print("Properly closing the clock and open GPIO pins")
+    Display.cleanup()
+
+tm.py
+
+import sleep
+
+def StartClock(self, military_time=True):
+    # Stop event based on: http://stackoverflow.com/a/6524542/3213667
+    self._stop_event = threading.Event()
+    self._clock_thread = threading.Thread(
+        target=self._clock, args=(military_time,))
+    self._clock_thread.start()
+
+def StopClock(self):
+    try:
+        print('Attempting to stop live clock')
+        self._stop_event.set()
+    except:
+        print ('No clock to close')
+
+if __name__ == "__main__":
+    # Confirm the display operation
+    display = TM1637(CLK=21, DIO=20, brightness=1.0)
+
+    display.Clear()
+
+    digits = [1, 2, 2, 4]
+    display.Show(digits)
+    print("1234 - Working? (Press Key)")
+    scrap = raw_input()
+
+    print ("Updating one digit at a time:")
+    display.Clear()
+    display.Show1(1, 3)
+    sleep(0.5)
+    display.Show1(2, 2)
+    sleep(0.5)
+    display.Show1(3, 1)
+    sleep(0.5)
+    display.Show1(4, 0)
+    print ("4321 - (Press Key)")
+    scrap = raw_input()
+
+command:
+sudo python clock.py
+
+
+Controlling Raspberry Pi with Telegram
+
+import datetime
+import telepot
+from telepot.loop import MessageLoop
+import RPi.GPIO as GPIO
+from time import sleep
+
+red_led=21
+green_led=20
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(red_led, GPIO.OUT)
+GPIO.setup(green_led, GPIO.OUT)
+now=datetime.datetime.now()
+
+def handle(msg):
+    chat_id=msg['chat']['id']
+    cmd=msg['text']
+    print('Received: ')
+    print(cmd)
+
+    if cmd=='/hi':
+        bot.sendMessage(chat_id, str("Hi!"))
+    elif cmd=='/r1':
+        bot.sendMessage(chat_id, str("Red led is ON"))
+        GPIO.output(red_led, True)
+    elif cmd=='/r0':
+        bot.sendMessage(chat_id, str("Red led is OFF"))
+        GPIO.output(red_led, False)
+    elif cmd=='/g1':
+        bot.sendMessage(chat_id, str("Green led is ON"))
+        GPIO.output(green_led, True)
+    elif cmd=='/g0':
+        bot.sendMessage(chat_id, str("Green led is OFF"))
+        GPIO.output(green_led, False)
+
+bot=telepot.Bot('7967807165:AAFQCAVNT1XRPSZNer-CK903XAgNDTP-o8')
+print(bot.getMe())
+
+MessageLoop(bot,handle).run_as_thread()
+print('Listening.')
+
+while 1:
+    sleep(10)
+except KeyboardInterrupt:
+    print("Exiting")
+    GPIO.cleanup()
+
+cammmand:
+pip3 install telepot --break-system-packages
+
+
+
+Interfacing Pi Camera with Raspberry Pi. 
+
+from picamzero import Camera
+
+cam = Camera()
+cam.take_photo("hello.jpg")
+cam.start_preview()
+sleep(2)
+command:
+sudo apt update
+sudo apt install python3-picamzero
+
+
+Interfacing Raspberry Pi with RFID
+read.py
+import RPi.GPIO as GPIO
+from mfrc522 import SimpleMFRC522
+reader = SimpleMFRC522()
+
+try:
+    print("place your card:")
+    id, text = reader.read()
+    print(id)
+    print(text)
+finally:
+    GPIO.cleanup()
+
+write.py
+
+import RPi.GPIO as GPIO
+from mfrc522 import SimpleMFRC522
+reader = SimpleMFRC522()
+
+try:
+    text = input('New data:')
+    print("Now place your tag to write")
+    reader.write(text)
+    print("written")
+finally:
+    GPIO.cleanup()
+
+cammand:
+sudo nano writetest.py
+sudo pip3 install mfrc522
+sudo raspi-config
+(After that go to interfacing option and enable the SPI and
+finish )
+sudo nano read.py 
+sudo python3 writetest.py
+enter :new dataMegaBytes
+
+
+
+Raspberry Pi GPS Module Interfacing 
+command:
+sudo raspi-config
+sudo reboot
+ls /dev/serial0
+sudo apt update
+sudo apt install gpsd gpsd-clients python3-gps
+sudo gpsd /dev/serial0 -F /var/run/gpsd.sock
+cgps -s
+
+
+
+
